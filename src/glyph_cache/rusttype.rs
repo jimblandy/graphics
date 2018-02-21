@@ -54,7 +54,7 @@ impl<'a, F, T> GlyphCache<'a, F, T>
         let mut file_buffer = Vec::new();
         file.read_to_end(&mut file_buffer)?;
 
-        let collection = rusttype::FontCollection::from_bytes(file_buffer);
+        let collection = rusttype::FontCollection::from_bytes(file_buffer)?;
         let font = collection.into_font().unwrap();
         Ok(GlyphCache {
             font: font,
@@ -69,8 +69,8 @@ impl<'a, F, T> GlyphCache<'a, F, T>
                       factory: F,
                       settings: TextureSettings)
                       -> Result<GlyphCache<'a, F, T>, ()> {
-        let collection = rusttype::FontCollection::from_bytes(font);
-        let font = collection.into_font().ok_or(())?;
+        let collection = rusttype::FontCollection::from_bytes(font).or(Err(()))?;
+        let font = collection.into_font().or(Err(()))?;
         Ok(Self::from_font(font, factory, settings))
     }
 
